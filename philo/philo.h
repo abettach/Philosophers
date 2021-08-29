@@ -50,5 +50,5 @@ t_vars   *ft_init(int ac, char **av, int i);
 void     *ft_routine(void *arg);
 long	  get_time(void);
 void	  msg_print(t_philo *philo, t_vars *vars, char *msg);
-int     ft_check(int ac, char **av);
+int       ft_check(int ac, char **av);
 #endif

@@ -80,7 +80,7 @@ int     main(int ac, char **av)
             pthread_detach(th);
             usleep(100);
         }
+        pthread_mutex_lock(&vars->main_mutex);
     }
-    pthread_mutex_lock(&vars->main_mutex);
     return 0;
 }

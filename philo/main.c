@@ -47,18 +47,18 @@ void    *ft_routine(void *arg)
     while (1)
     {
         pthread_mutex_lock(&vars->fork[philo->index]);
-	    printf_text(philo, vars, "🍴 take a fork");
+	    msg_print(philo, vars, "🍴 take a fork");
 	    pthread_mutex_lock(&vars->fork[philo->right_fork]);
-	    printf_text(philo, vars, "🍴 take a the right fork");
-        printf_text(philo, vars, "🍔 is eating");
+	    msg_print(philo, vars, "🍴 take a the right fork");
+        msg_print(philo, vars, "🍔 is eating");
 	    philo->time_left_die = get_time() + vars->time_to_die;
 	    usleep(vars->time_to_eat * 1000);
 	    philo->meal_nbr++;
 	    pthread_mutex_unlock(&vars->fork[philo->index]);
 	    pthread_mutex_unlock(&vars->fork[philo->right_fork]);
-	    printf_text(philo, vars, "💤 is sleeping");
+	    msg_print(philo, vars, "💤 is sleeping");
 	    usleep(vars->time_to_sleep * 1000);
-	    printf_text(philo, vars, "🤔 is thinking");
+	    msg_print(philo, vars, "🤔 is thinking");
     }
 }
 

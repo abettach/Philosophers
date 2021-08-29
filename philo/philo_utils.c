@@ -55,7 +55,7 @@ int     ft_check(int ac, char **av)
 	return (1);
 }
 
-void	printf_text(t_philo *philo, t_vars *vars, char *msg)
+void	msg_print(t_philo *philo, t_vars *vars, char *msg)
 {
 	long	time;
 

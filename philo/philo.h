@@ -49,7 +49,6 @@ int	     ft_atoi(const char *str);
 t_vars   *ft_init(int ac, char **av, int i);
 void     *ft_routine(void *arg);
 long	  get_time(void);
-void	  printf_text(t_philo *philo, t_vars *vars, char *msg);
+void	  msg_print(t_philo *philo, t_vars *vars, char *msg);
 int     ft_check(int ac, char **av);
-void	check_if_finished_eating(t_philo *philo, t_vars *vars);
 #endif

@@ -1,47 +1,86 @@
 #include "philo.h"
 
-int    ft_get_args(t_philo *p, char **av)
+void    *check_if_die(void *arg)
 {
-    p->num_philo = ft_atoi(av[1]);
-    p->time_die = ft_atoi(av[2]);
-    p->time_eat = ft_atoi(av[3]);
-    p->time_sleep = ft_atoi(av[4]);
-    if (av[5])
-    {
-        p->num_time_eat = ft_atoi(av[5]);
-        if (p->num_time_eat < 0)
-            return 0;
-    }
-    else
-        p->num_time_eat = -1;
-    if (p->num_philo <= 0 || p->time_die < 0 || p->time_eat < 0 || p->time_sleep < 0)
-        return 0;
-    return 1;
-}
-uint64_t	get_time(void)
-{
-	struct timeval	current_time;
+	t_philo	*philo;
+	t_vars	*vars;
 
-	gettimeofday(&current_time, NULL);
-	return ((current_time.tv_sec * 1000) + (current_time.tv_usec / 1000));
+	philo = (t_philo *)arg;
+	vars = philo->vars;
+	philo->time_left_die = get_time() + vars->time_to_die;
+    while (1)
+	{
+		if (get_time() > philo->time_left_die)
+		{
+			pthread_mutex_lock(&philo->vars->mutex_print);
+			printf("die %d\n", philo->index + 1);
+			pthread_mutex_unlock(&philo->vars->main_mutex);
+		}
+        if (philo->meal_nbr == vars->nbr_must_eat)
+		{
+            if (philo->already_eat == 0)
+	        {
+	          	vars->philo_finished_eating++;
+	        	philo->already_eat = 1;
+        	}
+        	if (vars->philo_finished_eating == vars->philo_nb)
+        	{
+	        	pthread_mutex_lock(&philo->vars->mutex_print);
+	        	printf("simulation finished: philo %d\n", philo->index + 1);
+	        	pthread_mutex_unlock(&philo->vars->main_mutex);
+	        }
+        }
+		usleep(1000);
+	}
+}
+
+void    *ft_routine(void *arg)
+{
+    t_philo *philo;
+    t_vars *vars;
+    pthread_t th;
+
+    philo = (t_philo *)arg;
+    vars = philo->vars;
+    pthread_create(&th, NULL, &check_if_die, philo);
+    pthread_detach(th);
+    while (1)
+    {
+        pthread_mutex_lock(&vars->fork[philo->index]);
+	    printf_text(philo, vars, "🍴 take a fork");
+	    pthread_mutex_lock(&vars->fork[philo->right_fork]);
+	    printf_text(philo, vars, "🍴 take a the right fork");
+        printf_text(philo, vars, "🍔 is eating");
+	    philo->time_left_die = get_time() + vars->time_to_die;
+	    usleep(vars->time_to_eat * 1000);
+	    philo->meal_nbr++;
+	    pthread_mutex_unlock(&vars->fork[philo->index]);
+	    pthread_mutex_unlock(&vars->fork[philo->right_fork]);
+	    printf_text(philo, vars, "💤 is sleeping");
+	    usleep(vars->time_to_sleep * 1000);
+	    printf_text(philo, vars, "🤔 is thinking");
+    }
 }
 
 int     main(int ac, char **av)
 {
-    t_philo p;
-    int i = 0;
-    uint64_t time = 0;
-    uint64_t time2 = 0;
-    uint64_t start = 0;
-    if (ft_get_args(&p, av) == 0)
-        return 0;
-    start = get_time();
-    while (i < p.num_philo)
+    t_vars *vars;
+    pthread_t th;
+    int i;
+
+    if (ft_check(ac, av) == 0)
+		printf("Error argument\n");
+    else
     {
-        time2 = time - start;
-        printf("time = %llu\n",time2);
-        i++;
+        vars = ft_init(ac, av, -1);
+        i = -1;
+        while (++i < vars->philo_nb)
+        {
+            pthread_create(&th, NULL, &ft_routine, &vars->philo[i]);
+            pthread_detach(th);
+            usleep(100);
+        }
     }
-    
+    pthread_mutex_lock(&vars->main_mutex);
     return 0;
 }

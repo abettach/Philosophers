@@ -1,5 +1,34 @@
 #include "philo.h"
 
+int	ft_free(t_vars *vars, char *msg)
+{
+	int i;
+
+	i = -1;
+	if (vars)
+	{
+		pthread_mutex_destroy(&vars->mutex_print);
+		pthread_mutex_destroy(&vars->main_mutex);
+		while (++i < vars->philo_nb)
+			pthread_mutex_destroy(&vars->fork[i]);
+		free(vars);
+		vars = NULL;
+	}
+	if (vars && vars->fork)
+		free(vars->fork);
+	if (vars && vars->philo)
+	{
+		free(vars->philo);
+		vars->philo = NULL;
+	}
+	if (msg)
+	{
+		printf("%s", msg);
+		return (ERROR);
+	}
+	return (0);
+}
+
 void    *check_if_die(void *arg)
 {
 	t_philo	*philo;
@@ -18,23 +47,15 @@ void    *check_if_die(void *arg)
 		}
         if (philo->meal_nbr == vars->nbr_must_eat)
 		{
-            if (philo->already_eat == 0)
-	        {
-	          	vars->philo_finished_eating++;
-	        	philo->already_eat = 1;
-        	}
-        	if (vars->philo_finished_eating == vars->philo_nb)
-        	{
-	        	pthread_mutex_lock(&philo->vars->mutex_print);
-	        	printf("simulation finished: philo %d\n", philo->index + 1);
-	        	pthread_mutex_unlock(&philo->vars->main_mutex);
-	        }
+	        pthread_mutex_lock(&philo->vars->mutex_print);
+	        printf("simulation finished: philo %d\n", philo->index + 1);
+	        pthread_mutex_unlock(&philo->vars->main_mutex);
         }
 		usleep(1000);
 	}
 }
 
-void    *ft_routine(void *arg)
+void    *start_routine(void *arg)
 {
     t_philo *philo;
     t_vars *vars;
@@ -69,18 +90,20 @@ int     main(int ac, char **av)
     int i;
 
     if (ft_check(ac, av) == 0)
-		printf("Error argument\n");
+		printf("Error: Check your arguments\n");
     else
     {
         vars = ft_init(ac, av, -1);
         i = -1;
         while (++i < vars->philo_nb)
         {
-            pthread_create(&th, NULL, &ft_routine, &vars->philo[i]);
+            if (pthread_create(&th, NULL, &start_routine, &vars->philo[i]))
+				return (ft_free(vars, "ERROR:create thread probleme\n"));
             pthread_detach(th);
             usleep(100);
         }
         pthread_mutex_lock(&vars->main_mutex);
+    	return (ft_free(vars, NULL));
     }
-    return 0;
+	return (ERROR);
 }

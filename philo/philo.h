@@ -18,6 +18,7 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <sys/time.h>
+#define ERROR 1
 
 typedef struct s_philo
 {
@@ -25,6 +26,7 @@ typedef struct s_philo
 	struct s_vars	*vars;
 	long			time_left_die;
 	int				right_fork;
+	int				left_fork;
 	int				meal_nbr;
 	int				already_eat;
 }	t_philo;
@@ -47,7 +49,7 @@ typedef struct s_vars
 char	*ft_strdup(const char *s1);
 int	     ft_atoi(const char *str);
 t_vars   *ft_init(int ac, char **av, int i);
-void     *ft_routine(void *arg);
+void     *start_routine(void *arg);
 long	  get_time(void);
 void	  msg_print(t_philo *philo, t_vars *vars, char *msg);
 int       ft_check(int ac, char **av);

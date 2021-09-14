@@ -2,7 +2,7 @@ NAME = philo
 CC = gcc -pthread
 FLAGS = 
 
-SRCS = main.c philo_utils.c
+SRCS = main.c philo_utils.c ft_free.c
 OBJS = $(SRCS:.c=.o)
 
 %.o:%.c

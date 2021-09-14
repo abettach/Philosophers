@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: abettach <abettach@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/09/14 15:33:50 by abettach          #+#    #+#             */
+/*   Updated: 2021/09/14 17:49:50 by abettach         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 long	get_time(void)
@@ -8,38 +20,34 @@ long	get_time(void)
 	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
 
-t_vars       *ft_init(int ac, char **av, int  i)
+t_args	*ft_init(int ac, char **av, int i)
 {
-    t_vars *vars;
+	t_args	*args;
 
-    vars = (t_vars *)malloc(sizeof(t_vars));
-    vars->philo_nb = ft_atoi(av[1]);
-    vars->time_to_die = ft_atoi(av[2]);
-    vars->time_to_eat = ft_atoi(av[3]);
-    vars->time_to_sleep = ft_atoi(av[4]);
-	vars->nbr_must_eat = (ac == 6) ? ft_atoi(av[5]) : -1;
-	vars->philo_finished_eating = 0;
-    vars->fork = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * vars->philo_nb);
-    vars->philo = (t_philo *)malloc(sizeof(t_philo) * vars->philo_nb);
-    pthread_mutex_init(&vars->mutex_print, NULL);
-    pthread_mutex_init(&vars->main_mutex,NULL);
-    pthread_mutex_lock(&vars->main_mutex);
-    vars->start_time = get_time();
-    while (++i < vars->philo_nb)
-	{
-		pthread_mutex_init(&vars->fork[i], NULL);
-	    vars->philo[i].vars = vars;
-	    vars->philo[i].index = i;
-	    vars->philo[i].right_fork = (i + 1) % vars->philo_nb;
-	    vars->philo[i].meal_nbr = 0;
-	    vars->philo[i].already_eat = 0;
-	}
-    return vars;
+	args = (t_args *)malloc(sizeof(t_args));
+	args->philo_nb = ft_atoi(av[1]);
+	args->time_to_die = ft_atoi(av[2]);
+	args->time_to_eat = ft_atoi(av[3]);
+	args->time_to_sleep = ft_atoi(av[4]);
+	if (ac == 6)
+		args->nbr_must_eat = ft_atoi(av[5]);
+	else
+		args->nbr_must_eat = -1;
+	args->philo_finished_eating = 0;
+	args->fork = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
+			* args->philo_nb);
+	args->philo = (t_philo *)malloc(sizeof(t_philo) * args->philo_nb);
+	pthread_mutex_init(&args->print, NULL);
+	pthread_mutex_init(&args->main, NULL);
+	pthread_mutex_lock(&args->main);
+	args->start_time = get_time();
+	ft_init2(args, i);
+	return (args);
 }
 
-int     ft_check(int ac, char **av)
+int	ft_check(int ac, char **av)
 {
-    int	i;
+	int	i;
 	int	j;
 
 	if (ac != 6 && ac != 5)
@@ -55,14 +63,14 @@ int     ft_check(int ac, char **av)
 	return (1);
 }
 
-void	msg_print(t_philo *philo, t_vars *vars, char *msg)
+void	msg_print(t_philo *philo, t_args *args, char *msg)
 {
 	long	time;
 
-	time = get_time() - vars->start_time;
-	pthread_mutex_lock(&vars->mutex_print);
+	time = get_time() - args->start_time;
+	pthread_mutex_lock(&args->print);
 	printf("%ld\t%d\t%s\n", time, philo->index + 1, msg);
-	pthread_mutex_unlock(&vars->mutex_print);
+	pthread_mutex_unlock(&args->print);
 }
 
 int	ft_atoi(const char *str)

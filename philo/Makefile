@@ -1,9 +1,12 @@
-NAME = philo
-CC = gcc -pthread
-FLAGS = 
+NAME	= philo
+CC		= gcc
+FLAGS	= -Wall -Wextra -Werror
 
-SRCS = main.c philo_utils.c ft_free.c
-OBJS = $(SRCS:.c=.o)
+SRCS	= main.c \
+		philo_utils.c \
+		ft_free.c
+
+OBJS	= $(SRCS:.c=.o)
 
 %.o:%.c
 	$(CC) $(FLAGS) -c $< -o $@

@@ -6,7 +6,7 @@
 /*   By: abettach <abettach@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/14 15:33:50 by abettach          #+#    #+#             */
-/*   Updated: 2021/09/14 17:49:50 by abettach         ###   ########.fr       */
+/*   Updated: 2021/09/15 16:07:37 by abettach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,15 @@ t_args	*ft_init(int ac, char **av, int i)
 		args->nbr_must_eat = ft_atoi(av[5]);
 	else
 		args->nbr_must_eat = -1;
-	args->philo_finished_eating = 0;
+	args->finished_eating = 0;
 	args->fork = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
 			* args->philo_nb);
 	args->philo = (t_philo *)malloc(sizeof(t_philo) * args->philo_nb);
 	pthread_mutex_init(&args->print, NULL);
 	pthread_mutex_init(&args->main, NULL);
+	pthread_mutex_init(&args->stop, NULL);
 	pthread_mutex_lock(&args->main);
+	pthread_mutex_lock(&args->stop);
 	args->start_time = get_time();
 	ft_init2(args, i);
 	return (args);

@@ -6,7 +6,7 @@
 /*   By: abettach <abettach@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/17 11:31:58 by abettach          #+#    #+#             */
-/*   Updated: 2021/09/14 18:35:17 by abettach         ###   ########.fr       */
+/*   Updated: 2021/09/15 16:36:52 by abettach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ typedef struct s_philo
 	long			time_left_die;
 	int				right_fork;
 	int				left_fork;
-	int				meal_nbr;
+	int				nbr_of_meal;
 	int				already_eat;
 }	t_philo;
 
@@ -39,10 +39,11 @@ typedef struct s_args
 	int				philo_nb;
 	long			start_time;
 	int				nbr_must_eat;
-	int				philo_finished_eating;
+	int				finished_eating;
 	pthread_mutex_t	*fork;
 	pthread_mutex_t	print;
 	pthread_mutex_t	main;
+	pthread_mutex_t	stop;
 	t_philo			*philo;
 }	t_args;
 
@@ -55,5 +56,6 @@ void		msg_print(t_philo *philo, t_args *args, char *msg);
 int			ft_check(int ac, char **av);
 void		ft_init2(t_args *args, int i);
 int			ft_free(t_args *args, char *msg);
+void		ft_unlock_forks(t_args *args, t_philo *philo);
 
 #endif

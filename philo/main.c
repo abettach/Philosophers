@@ -6,7 +6,7 @@
 /*   By: abettach <abettach@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/14 15:30:33 by abettach          #+#    #+#             */
-/*   Updated: 2021/09/14 18:44:12 by abettach         ###   ########.fr       */
+/*   Updated: 2021/09/15 17:52:00 by abettach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	ft_init2(t_args *args, int i)
 		args->philo[i].args = args;
 		args->philo[i].index = i;
 		args->philo[i].right_fork = (i + 1) % args->philo_nb;
-		args->philo[i].meal_nbr = 0;
+		args->philo[i].nbr_of_meal = 0;
 		args->philo[i].already_eat = 0;
 	}
 }
@@ -36,7 +36,7 @@ void	ft_finish(t_philo *philo, int var)
 	if (var == 2)
 	{
 		pthread_mutex_lock(&philo->args->print);
-		printf("simulation finished: philo %d\n", philo->index + 1);
+		printf("simulation finished\n");
 		pthread_mutex_unlock(&philo->args->main);
 	}
 }
@@ -51,17 +51,17 @@ void	*check_if_die(void *arg)
 	philo->time_left_die = get_time() + args->time_to_die;
 	while (1)
 	{
-		if (get_time() > philo->time_left_die 
-			&& philo->meal_nbr != args->nbr_must_eat)
+		if (get_time() > philo->time_left_die
+			&& philo->nbr_of_meal != args->nbr_must_eat)
 			ft_finish(philo, 1);
-		if (philo->meal_nbr == args->nbr_must_eat)
+		if (philo->nbr_of_meal == args->nbr_must_eat)
 		{
 			if (philo->already_eat == 0)
 			{
-				args->philo_finished_eating++;
+				args->finished_eating++;
 				philo->already_eat = 1;
 			}
-			if (args->philo_finished_eating == args->philo_nb)
+			if (args->finished_eating == args->philo_nb)
 				ft_finish(philo, 2);
 		}
 		usleep(1000);
@@ -83,13 +83,14 @@ void	*start_routine(void *arg)
 		pthread_mutex_lock(&args->fork[philo->index]);
 		msg_print(philo, args, "🍴 take the left fork");
 		pthread_mutex_lock(&args->fork[philo->right_fork]);
-		msg_print(philo, args, "🍴 take the right fork");	
+		msg_print(philo, args, "🍴 take the right fork");
 		msg_print(philo, args, "🍔 is eating");
 		philo->time_left_die = get_time() + args->time_to_die;
 		usleep(args->time_to_eat * 1000);
-		philo->meal_nbr++;
-		pthread_mutex_unlock(&args->fork[philo->index]);
-		pthread_mutex_unlock(&args->fork[philo->right_fork]);
+		philo->nbr_of_meal++;
+		ft_unlock_forks(args, philo);
+		if (philo->nbr_of_meal == args->nbr_must_eat)
+			pthread_mutex_lock(&args->stop);
 		msg_print(philo, args, "💤 is sleeping");
 		usleep(args->time_to_sleep * 1000);
 		msg_print(philo, args, "🤔 is thinking");
@@ -116,6 +117,7 @@ int	main(int ac, char **av)
 			usleep(100);
 		}
 		pthread_mutex_lock(&args->main);
+		pthread_mutex_unlock(&args->stop);
 		return (ft_free(args, NULL));
 	}
 	return (ERROR);

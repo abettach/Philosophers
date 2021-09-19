@@ -6,11 +6,17 @@
 /*   By: abettach <abettach@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/14 17:06:43 by abettach          #+#    #+#             */
-/*   Updated: 2021/09/14 17:32:43 by abettach         ###   ########.fr       */
+/*   Updated: 2021/09/15 16:36:04 by abettach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+void	ft_unlock_forks(t_args *args, t_philo *philo)
+{
+	pthread_mutex_unlock(&args->fork[philo->index]);
+	pthread_mutex_unlock(&args->fork[philo->right_fork]);
+}
 
 int	ft_free(t_args *args, char *msg)
 {

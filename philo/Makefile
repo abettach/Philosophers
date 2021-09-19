@@ -1,6 +1,6 @@
 NAME	= philo
 CC		= gcc
-FLAGS	= -Wall -Wextra -Werror
+FLAGS	=
 
 SRCS	= main.c \
 		philo_utils.c \

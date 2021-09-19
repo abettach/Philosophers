@@ -6,7 +6,7 @@
 /*   By: abettach <abettach@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/14 15:30:33 by abettach          #+#    #+#             */
-/*   Updated: 2021/09/15 17:52:00 by abettach         ###   ########.fr       */
+/*   Updated: 2021/09/19 17:39:13 by abettach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,7 @@ void	*check_if_die(void *arg)
 	philo->time_left_die = get_time() + args->time_to_die;
 	while (1)
 	{
-		if (get_time() > philo->time_left_die
-			&& philo->nbr_of_meal != args->nbr_must_eat)
+		if (get_time() > philo->time_left_die)
 			ft_finish(philo, 1);
 		if (philo->nbr_of_meal == args->nbr_must_eat)
 		{
@@ -63,8 +62,8 @@ void	*check_if_die(void *arg)
 			}
 			if (args->finished_eating == args->philo_nb)
 				ft_finish(philo, 2);
+			usleep(100);
 		}
-		usleep(1000);
 	}
 }
 
@@ -87,8 +86,8 @@ void	*start_routine(void *arg)
 		msg_print(philo, args, "🍔 is eating");
 		philo->time_left_die = get_time() + args->time_to_die;
 		usleep(args->time_to_eat * 1000);
-		philo->nbr_of_meal++;
 		ft_unlock_forks(args, philo);
+		philo->nbr_of_meal++;
 		if (philo->nbr_of_meal == args->nbr_must_eat)
 			pthread_mutex_lock(&args->stop);
 		msg_print(philo, args, "💤 is sleeping");
@@ -104,7 +103,10 @@ int	main(int ac, char **av)
 	int			i;
 
 	if (ft_check(ac, av) == 0)
+	{
 		printf("Error: Check your arguments\n");
+		return (ERROR);
+	}
 	else
 	{
 		args = ft_init(ac, av, -1);
@@ -112,13 +114,12 @@ int	main(int ac, char **av)
 		while (++i < args->philo_nb)
 		{
 			if (pthread_create(&th, NULL, &start_routine, &args->philo[i]))
-				return (ft_free(args, "ERROR:create thread probleme\n"));
+				return (ft_free(args, "ERROR:create thread probleme\n", -1));
 			pthread_detach(th);
 			usleep(100);
 		}
 		pthread_mutex_lock(&args->main);
-		pthread_mutex_unlock(&args->stop);
-		return (ft_free(args, NULL));
+		return (ft_free(args, NULL, -1));
 	}
-	return (ERROR);
+	return (0);
 }

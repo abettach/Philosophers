@@ -6,7 +6,7 @@
 /*   By: abettach <abettach@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/17 11:31:58 by abettach          #+#    #+#             */
-/*   Updated: 2021/09/15 16:36:52 by abettach         ###   ########.fr       */
+/*   Updated: 2021/09/19 17:35:47 by abettach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ long		get_time(void);
 void		msg_print(t_philo *philo, t_args *args, char *msg);
 int			ft_check(int ac, char **av);
 void		ft_init2(t_args *args, int i);
-int			ft_free(t_args *args, char *msg);
+int			ft_free(t_args *args, char *msg, int i);
 void		ft_unlock_forks(t_args *args, t_philo *philo);
 
 #endif
